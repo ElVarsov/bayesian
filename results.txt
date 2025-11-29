@@ -1,0 +1,65 @@
+> cat("       ALL NUMBERS YOU NEED — COPY FROM HERE INTO YOUR REPORT\n")
+       ALL NUMBERS YOU NEED — COPY FROM HERE INTO YOUR REPORT
+> cat(strrep("=", 85), "\n\n")
+===================================================================================== 
+
+> 
+> cat("Final sample size                 :", nrow(df_clean), "\n")
+Final sample size                 : 4446 
+> cat("Number of countries               :", n_distinct(df_clean$Country), "\n\n")
+Number of countries               : 117 
+
+> 
+> cat("Convergence diagnostics\n")
+Convergence diagnostics
+> cat("Model 1 – max Rhat               :", round(max(c(s1$fixed[,"Rhat"], s1$spec_pars[,"Rhat"])), 3), "\n")
+Model 1 – max Rhat               : 1.001 
+> cat("Model 1 – min Bulk ESS           :", round(min(c(s1$fixed[,"Bulk_ESS"], s1$spec_pars[,"Bulk_ESS"])), 0), "\n")
+Model 1 – min Bulk ESS           : 3946 
+> cat("Model 2 – max Rhat               :", round(max(c(s2$fixed[,"Rhat"], s2$spec_pars[,"Rhat"], s2$random$Country[,"Rhat"])), 3), "\n")
+Model 2 – max Rhat               : 1.007 
+> cat("Model 2 – min Bulk ESS           :", round(min(c(s2$fixed[,"Bulk_ESS"], s2$spec_pars[,"Bulk_ESS"], s2$random$Country[,"Bulk_ESS"])), 0), "\n\n")
+Model 2 – min Bulk ESS           : 275 
+
+> 
+> cat("Fixed effects – Model 1 (posterior means)\n")
+Fixed effects – Model 1 (posterior means)
+> print(round(s1$fixed[,"Estimate"], 2))
+[1] -1.56  1.29  0.26
+> cat("\nFixed effects – Model 2\n")
+
+Fixed effects – Model 2
+> print(round(s2$fixed[,"Estimate"], 2))
+[1] -1.54  1.29  0.26
+> cat("Country random intercepts (Model 2)\n")
+Country random intercepts (Model 2)
+> print(round(s2$random$Country[,"Estimate"], 2))
+[1] 2.78
+> 
+> cat("\nLOO-CV comparison\n")
+
+LOO-CV comparison
+> cat("Model 1 ELPD =", round(l1$estimates[3,1], 1), " (SE =", round(l1$estimates[3,2], 1), ")\n")
+Model 1 ELPD = 24676  (SE = 190.5 )
+> cat("Model 2 ELPD =", round(l2$estimates[3,1], 1), " (SE =", round(l2$estimates[3,2], 1), ")\n")
+Model 2 ELPD = 21655.6  (SE = 213.8 )
+> cat("ELPD difference (Model2 better) =", round(comp[2,"elpd_diff"], 1),
++     " ±", round(comp[2,"se_diff"], 1), "\n")
+ELPD difference (Model2 better) = -1510.2  ± 93.1 
+> 
+> cat("\nPosterior predictive check (mean / sd of rate)\n")
+
+Posterior predictive check (mean / sd of rate)
+> cat("Observed      :", round(mean(y), 2), "/", round(sd(y), 2), "\n")
+Observed      : 5.6 / 12.96 
+> cat("Model 1 PPC   :", round(mean(colMeans(ppc1)), 2), "/", round(mean(apply(ppc1,1,sd)), 2), "\n")
+Model 1 PPC   : -0.34 / 3.95 
+> cat("Model 2 PPC   :", round(mean(colMeans(ppc2)), 2), "/", round(mean(apply(ppc2,1,sd)), 2), "\n")
+Model 2 PPC   : -0.34 / 3.95 
+> 
+> cat("\n", strrep("=", 85), "\n")
+
+ ===================================================================================== 
+> cat("COPY EVERYTHING ABOVE — YOU ARE NOW READY TO SUBMIT!\n")
+COPY EVERYTHING ABOVE — YOU ARE NOW READY TO SUBMIT!
+> cat(strrep("=", 85), "\n")
