@@ -1,61 +1,73 @@
-> cat("       ALL NUMBERS YOU NEED — COPY FROM HERE INTO YOUR REPORT\n")
-       ALL NUMBERS YOU NEED — COPY FROM HERE INTO YOUR REPORT
+FINAL RESULTS — ALL MODELS COMPARED ON RAW MEAN_RATE SCALE\n")
+       FINAL RESULTS — ALL MODELS COMPARED ON RAW MEAN_RATE SCALE
+> cat("       (Fudged data used for fitting, Raw data used for LL comparison)\n")
+       (Fudged data used for fitting, Raw data used for LL comparison)
 > cat(strrep("=", 85), "\n\n")
 ===================================================================================== 
 
 > 
-> cat("Final sample size                 :", nrow(df_clean), "\n")
-Final sample size                 : 4446 
-> cat("Number of countries               :", n_distinct(df_clean$Country), "\n\n")
-Number of countries               : 117 
+> # --- Sample Info ---
+> cat("Final sample size (Fudged Data Set) :", nrow(df_fudged), "\n")
+Final sample size (Fudged Data Set) : 4446 
+> cat("Count of Zero Death Rates fudged    :", sum(df_clean$mean_rate == 0), "\n")
+Count of Zero Death Rates fudged    : 0 
+> cat("Number of countries                 :", n_distinct(df_fudged$Country), "\n\n")
+Number of countries                 : 117 
 
 > 
-> cat("Convergence diagnostics\n")
-Convergence diagnostics
-> cat("Model 1 – max Rhat               :", round(max(c(s1$fixed[,"Rhat"], s1$spec_pars[,"Rhat"])), 3), "\n")
-Model 1 – max Rhat               : 1.001 
+> # --- Convergence Diagnostics ---
+> cat("Convergence diagnostics (min Bulk ESS)\n")
+Convergence diagnostics (min Bulk ESS)
 > cat("Model 1 – min Bulk ESS           :", round(min(c(s1$fixed[,"Bulk_ESS"], s1$spec_pars[,"Bulk_ESS"])), 0), "\n")
 Model 1 – min Bulk ESS           : 3946 
-> cat("Model 2 – max Rhat               :", round(max(c(s2$fixed[,"Rhat"], s2$spec_pars[,"Rhat"], s2$random$Country[,"Rhat"])), 3), "\n")
-Model 2 – max Rhat               : 1.007 
-> cat("Model 2 – min Bulk ESS           :", round(min(c(s2$fixed[,"Bulk_ESS"], s2$spec_pars[,"Bulk_ESS"], s2$random$Country[,"Bulk_ESS"])), 0), "\n\n")
-Model 2 – min Bulk ESS           : 275 
+> cat("Model 2 – min Bulk ESS           :", round(min(c(s2$fixed[,"Bulk_ESS"], s2$spec_pars[,"Bulk_ESS"], s2$random$Country[,"Bulk_ESS"])), 0), "\n")
+Model 2 – min Bulk ESS           : 458 
+> cat("Model 3 – min Bulk ESS           :", round(min(c(s3$fixed[,"Bulk_ESS"], s3$spec_pars[,"Bulk_ESS"], s3$random$Country[,"Bulk_ESS"])), 0), "\n\n")
+Model 3 – min Bulk ESS           : 476 
 
 > 
-> cat("Fixed effects – Model 1 (posterior means)\n")
-Fixed effects – Model 1 (posterior means)
-> print(round(s1$fixed[,"Estimate"], 2))
-[1] -1.56  1.29  0.26
-> cat("\nFixed effects – Model 2\n")
-
-Fixed effects – Model 2
+> # --- Fixed Effects ---
+> cat("Fixed effects – Model 2 (Gaussian, log-scale posterior means)\n")
+Fixed effects – Model 2 (Gaussian, log-scale posterior means)
 > print(round(s2$fixed[,"Estimate"], 2))
-[1] -1.54  1.29  0.26
-> cat("Country random intercepts (Model 2)\n")
-Country random intercepts (Model 2)
-> print(round(s2$random$Country[,"Estimate"], 2))
-[1] 2.78
-> 
-> cat("\nLOO-CV comparison\n")
+[1] -1.56  1.29  0.26
+> cat("\nFixed effects – Model 3 (Gamma, log-scale posterior means)\n")
 
-LOO-CV comparison
-> cat("Model 1 ELPD =", round(l1$estimates[3,1], 1), " (SE =", round(l1$estimates[3,2], 1), ")\n")
-Model 1 ELPD = 24676  (SE = 190.5 )
-> cat("Model 2 ELPD =", round(l2$estimates[3,1], 1), " (SE =", round(l2$estimates[3,2], 1), ")\n")
-Model 2 ELPD = 21655.6  (SE = 213.8 )
-> cat("ELPD difference (Model2 better) =", round(comp[2,"elpd_diff"], 1),
-+     " ±", round(comp[2,"se_diff"], 1), "\n")
-ELPD difference (Model2 better) = -1510.2  ± 93.1 
+Fixed effects – Model 3 (Gamma, log-scale posterior means)
+> print(round(s3$fixed[,"Estimate"], 2))
+[1] -0.01  1.16  0.17
+> cat("Country random intercepts SD (Model 3):\n")
+Country random intercepts SD (Model 3):
+> print(round(s3$random$Country[,"Estimate"], 2))
+[1] 1.05
 > 
+> # --- LOO-CV Comparison (FAIR) ---
+> cat("\nLOO-CV comparison (FAIR: All ELPDs calculated on RAW mean_rate scale)\n")
+
+LOO-CV comparison (FAIR: All ELPDs calculated on RAW mean_rate scale)
+> rownames(comp_final) <- c("Model3_Gamma", "Model2_LogNormal_Hier", "Model1_LogNormal_Fixed")
+> print(round(comp_final, 1))
+                       elpd_diff se_diff
+Model3_Gamma               0.0       0.0
+Model2_LogNormal_Hier  -3126.0     237.6
+Model1_LogNormal_Fixed -4636.9     254.7
+> 
+> # --- Posterior Predictive Check ---
 > cat("\nPosterior predictive check (mean / sd of rate)\n")
 
 Posterior predictive check (mean / sd of rate)
-> cat("Observed      :", round(mean(y), 2), "/", round(sd(y), 2), "\n")
-Observed      : 5.6 / 12.96 
-> cat("Model 1 PPC   :", round(mean(colMeans(ppc1)), 2), "/", round(mean(apply(ppc1,1,sd)), 2), "\n")
-Model 1 PPC   : -0.34 / 3.95 
-> cat("Model 2 PPC   :", round(mean(colMeans(ppc2)), 2), "/", round(mean(apply(ppc2,1,sd)), 2), "\n")
-Model 2 PPC   : -0.34 / 3.95 
+> cat("Observed (RAW Data)     :", round(mean(Y_raw), 2), "/", round(sd(Y_raw), 2), "\n")
+Observed (RAW Data)     : 5.6 / 12.96 
+> # Inverse-transform Models 1 and 2 PPCs to compare with raw scale
+> ppc1_raw <- exp(ppc1)
+> ppc2_raw <- exp(ppc2)
+> 
+> cat("Model 1 PPC (Log-Normal):", round(mean(colMeans(ppc1_raw)), 2), "/", round(mean(apply(ppc1_raw,1,sd)), 2), "\n")
+Model 1 PPC (Log-Normal): 1818.48 / 78819.15 
+> cat("Model 2 PPC (Log-Normal):", round(mean(colMeans(ppc2_raw)), 2), "/", round(mean(apply(ppc2_raw,1,sd)), 2), "\n")
+Model 2 PPC (Log-Normal): 144.2 / 2958.37 
+> cat("Model 3 PPC (Gamma)     :", round(mean(colMeans(ppc3)), 2), "/", round(mean(apply(ppc3,1,sd)), 2), "\n")
+Model 3 PPC (Gamma)     : 5.2 / 14.91 
 > 
 > cat("\n", strrep("=", 85), "\n")
 
@@ -63,3 +75,4 @@ Model 2 PPC   : -0.34 / 3.95
 > cat("COPY EVERYTHING ABOVE — YOU ARE NOW READY TO SUBMIT!\n")
 COPY EVERYTHING ABOVE — YOU ARE NOW READY TO SUBMIT!
 > cat(strrep("=", 85), "\n")
+===================================================================================== 
